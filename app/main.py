@@ -1,15 +1,9 @@
-import coloredlogs
 import logging
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 
-import numpy as np
-import pandas as pd
-
-coloredlogs.install()
-
-LOG_FILENAME = "app.log"
 logging.basicConfig(
-    filename=LOG_FILENAME,
-    force=True,
     level=logging.INFO,
     format="[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s",
 )
@@ -17,10 +11,15 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-def main():
-    log.info("Done")
-    pass
+app = FastAPI(title="NBA API")
+templates = Jinja2Templates(directory="templates")
 
+@app.get("/")
+def read_root():
+    return {"API": "Hello NBA"}
 
-if __name__ == "__main__":
-    main()
+@app.get("/home", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html", {"request": request}
+    )
